@@ -5,7 +5,7 @@ const FEED_COLORS = ["#FF6B6B", "#7C5CFF", "#4CC9F0", "#FFB84C", "#FF6FB5", "#38
 const PROXY = "https://api.allorigins.win/raw?url=";
 
 const SEED_FEEDS = [
-  { url: "https://feeds.feedburner.com/geeknews-feed", name: "GeekNews" },
+  { url: "https://technologyreview.com/feed/", name: "MIT" },
 ];
 
 function uid() {

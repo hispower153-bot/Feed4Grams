@@ -20,7 +20,9 @@ const FEED_COLORS = ["#FF6B6B", "#7C5CFF", "#4CC9F0", "#FFB84C", "#FF6FB5", "#38
 const STORAGE_KEY = "feedgram:feeds:v1";
 
 const SEED_FEEDS: Array<{ url: string; name: string }> = [
-  { url: "https://rss.app/feeds/t9PxdHAWdb8ch660.xml", name: "재미있는이야기" },
+  { url: "https://technologyreview.com/feed/", name: "MIT" },
+  { url: "https://www.yna.co.kr/rss/news.xml", name: "연합" },
+  { url: "http://rss.kbench.com/news.xml", name: "케이벤치" },
 ];
 
 type Feed = SavedFeed & { loading?: boolean; error?: boolean; errorMsg?: string };
@@ -297,9 +299,8 @@ export default function Home() {
           <nav className="flex flex-col gap-1.5">
             <button
               onClick={() => setActiveFeedId("all")}
-              className={`flex items-center justify-between rounded-xl px-3 py-2 text-sm font-medium text-left ${
-                activeFeedId === "all" ? "bg-[var(--color-ink)] text-white" : "text-[var(--color-ink)]"
-              }`}
+              className={`flex items-center justify-between rounded-xl px-3 py-2 text-sm font-medium text-left ${activeFeedId === "all" ? "bg-[var(--color-ink)] text-white" : "text-[var(--color-ink)]"
+                }`}
             >
               전체 보기
               <span className="font-mono-ui text-[11px] opacity-70">{articles.length}</span>
@@ -308,9 +309,8 @@ export default function Home() {
               <div key={f.id} className="group relative">
                 <button
                   onClick={() => setActiveFeedId(f.id)}
-                  className={`w-full flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-left pr-7 ${
-                    activeFeedId === f.id ? "bg-[var(--color-ink)] text-white" : "text-[var(--color-ink)]"
-                  }`}
+                  className={`w-full flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-left pr-7 ${activeFeedId === f.id ? "bg-[var(--color-ink)] text-white" : "text-[var(--color-ink)]"
+                    }`}
                 >
                   {f.loading ? (
                     <Loader2 size={10} className="fg-spin shrink-0" style={{ color: f.color }} />
@@ -325,9 +325,8 @@ export default function Home() {
                 <button
                   onClick={() => removeFeed(f.id)}
                   aria-label={`${f.name} 피드 삭제`}
-                  className={`absolute right-1.5 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 w-5 h-5 rounded-full flex items-center justify-center ${
-                    activeFeedId === f.id ? "text-white" : "text-[var(--color-muted)]"
-                  }`}
+                  className={`absolute right-1.5 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 w-5 h-5 rounded-full flex items-center justify-center ${activeFeedId === f.id ? "text-white" : "text-[var(--color-muted)]"
+                    }`}
                 >
                   <X size={13} />
                 </button>
@@ -367,9 +366,8 @@ export default function Home() {
           <div className="flex lg:hidden gap-2 overflow-x-auto fg-scroll pb-3 mb-1 -mx-1 px-1">
             <button
               onClick={() => setActiveFeedId("all")}
-              className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold ${
-                activeFeedId === "all" ? "bg-[var(--color-ink)] text-white" : "bg-[var(--color-chip)] text-[var(--color-ink)]"
-              }`}
+              className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold ${activeFeedId === "all" ? "bg-[var(--color-ink)] text-white" : "bg-[var(--color-chip)] text-[var(--color-ink)]"
+                }`}
             >
               전체
             </button>
@@ -377,9 +375,8 @@ export default function Home() {
               <button
                 key={f.id}
                 onClick={() => setActiveFeedId(f.id)}
-                className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold flex items-center gap-1.5 ${
-                  activeFeedId === f.id ? "bg-[var(--color-ink)] text-white" : "bg-[var(--color-chip)] text-[var(--color-ink)]"
-                }`}
+                className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold flex items-center gap-1.5 ${activeFeedId === f.id ? "bg-[var(--color-ink)] text-white" : "bg-[var(--color-chip)] text-[var(--color-ink)]"
+                  }`}
               >
                 <span className="w-1.5 h-1.5 rounded-full" style={{ background: f.color }} />
                 {f.name}
