@@ -109,11 +109,13 @@ export default function Home() {
   // Posting & Scheduler State
   const [posting, setPosting] = useState(false);
   const [postResultMsg, setPostResultMsg] = useState<string | null>(null);
-  const [postMode, setPostMode] = useState<"idle" | "preview" | "posted" | "error">("idle");
+  const [postMode, setPostMode] = useState<"idle" | "posted" | "error">("idle");
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [scheduleTime, setScheduleTime] = useState("");
   const [scheduledPosts, setScheduledPosts] = useState<ScheduledPost[]>([]);
   const [activeTab, setActiveTab] = useState<"editor" | "scheduler">("editor");
+  const [igConnected, setIgConnected] = useState<boolean | null>(null);
+  const [igUsername, setIgUsername] = useState<string | null>(null);
 
   const [showInfo, setShowInfo] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
@@ -347,6 +349,21 @@ export default function Home() {
     setTimeout(() => setToast(null), 2500);
   };
 
+  // Instagram 연결 상태 확인
+  useEffect(() => {
+    fetch("/api/instagram")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.ok && d.connected) {
+          setIgConnected(true);
+          setIgUsername(d.account?.username || null);
+        } else {
+          setIgConnected(false);
+        }
+      })
+      .catch(() => setIgConnected(false));
+  }, []);
+
   const handlePost = async () => {
     if (!selected || posting) return;
     setPosting(true);
@@ -358,17 +375,14 @@ export default function Home() {
         body: JSON.stringify({ imageUrl: selected.image, caption }),
       });
       const data = await res.json();
-      if (!res.ok) {
-        setPostMode("error");
-        setPostResultMsg(data?.message || "게시에 실패했습니다.");
-      } else if (data.mode === "preview") {
-        setPostMode("preview");
-        setPostResultMsg(data.message);
-      } else {
+      if (data.ok) {
         setPostMode("posted");
         setPostResultMsg(data.permalink ? `게시 완료: ${data.permalink}` : "게시가 완료되었습니다.");
         setToast("인스타그램에 성공적으로 포스팅되었습니다! 🚀");
         setTimeout(() => setToast(null), 2600);
+      } else {
+        setPostMode("error");
+        setPostResultMsg(data.message || "게시에 실패했습니다.");
       }
     } catch {
       setPostMode("error");
@@ -789,6 +803,16 @@ export default function Home() {
               <Camera size={15} className="text-purple-400" />
               인스타그램 카드 & AI Studio
             </div>
+            {igConnected !== null && (
+              <span className={`flex items-center gap-1.5 text-[10px] font-mono-ui font-bold px-2.5 py-1 rounded-full border ${
+                igConnected
+                  ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/30"
+                  : "text-red-400 bg-red-500/10 border-red-500/30"
+              }`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${igConnected ? "bg-emerald-400 shadow-sm shadow-emerald-400/50" : "bg-red-400"}`} />
+                {igConnected ? (igUsername ? `@${igUsername}` : "연결됨") : "미연결"}
+              </span>
+            )}
           </div>
 
           {!selected ? (

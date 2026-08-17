@@ -31,8 +31,19 @@ export type CaptionResponse = {
 };
 
 export type InstagramPostResponse =
-  | { mode: "preview"; message: string }
-  | { mode: "posted"; permalink: string | null };
+  | { ok: true; type: "image" | "carousel" | "reels"; mediaId: string; permalink: string | null }
+  | { ok: false; error: string; message: string; detail?: unknown };
+
+export type InstagramAccountInfo = {
+  connected: boolean;
+  account: {
+    name: string;
+    username: string;
+    profilePicture: string | null;
+    mediaCount: number;
+  };
+};
+
 
 export type ScheduledPost = {
   id: string;
