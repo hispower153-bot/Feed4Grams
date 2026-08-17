@@ -32,7 +32,7 @@ import type {
 } from "@/lib/types";
 import { drawCardToCanvas } from "@/lib/cardCanvas";
 
-const FEED_COLORS = ["#FF6B6B", "#7C5CFF", "#4CC9F0", "#FFB84C", "#FF6FB5", "#38D9A9"];
+const FEED_COLORS = ["#8B5CF6", "#EC4899", "#06B6D4", "#F59E0B", "#10B981", "#F43F5E"];
 const STORAGE_KEY = "feedgram:feeds:v1";
 const BOOKMARKS_STORAGE_KEY = "feedgram:bookmarks:v1";
 const SCHEDULED_STORAGE_KEY = "feedgram:scheduled:v1";
@@ -68,15 +68,15 @@ function timeAgo(dateStr: string) {
 function errorLabel(errCode: string | undefined) {
   switch (errCode) {
     case "TIMEOUT":
-      return "응답 시간이 초과됐어요";
+      return "응답 시간 초과";
     case "EMPTY_FEED":
-      return "기사를 찾지 못했어요";
+      return "기사를 찾지 못함";
     case "INVALID_URL":
-      return "올바르지 않은 주소예요";
+      return "올바르지 않은 주소";
     case "FETCH_FAILED":
-      return "피드를 가져오지 못했어요";
+      return "피드 가져오기 실패";
     default:
-      return "불러오기에 실패했어요";
+      return "불러오기 실패";
   }
 }
 
@@ -227,7 +227,7 @@ export default function Home() {
     setBookmarks((prev) => {
       const exists = prev.includes(articleId);
       const next = exists ? prev.filter((id) => id !== articleId) : [...prev, articleId];
-      setToast(exists ? "북마크에서 제거되었습니다." : "기사가 북마크에 저장되었습니다! 📌");
+      setToast(exists ? "북마크에서 제거되었습니다." : "북마크함에 보관되었습니다 ✨");
       setTimeout(() => setToast(null), 2000);
       return next;
     });
@@ -237,11 +237,11 @@ export default function Home() {
     const url = feedInput.trim();
     if (!url) return;
     if (!/^https?:\/\//i.test(url)) {
-      setAddError("http:// 또는 https:// 로 시작하는 주소를 입력해 주세요");
+      setAddError("http:// 또는 https:// 주소를 정확히 입력해 주세요.");
       return;
     }
     if (feeds.some((f) => f.url === url)) {
-      setAddError("이미 등록된 피드예요");
+      setAddError("이미 등록된 RSS 주소입니다.");
       return;
     }
     setAddError("");
@@ -305,12 +305,12 @@ export default function Home() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setCaption(data?.message || "캡션 생성에 실패했어요.");
+        setCaption(data?.message || "캡션 생성 실패");
         return;
       }
       setCaption(data.caption || "");
     } catch {
-      setCaption("캡션 생성 중 오류가 발생했어요. 잠시 후 다시 시도해 주세요.");
+      setCaption("캡션 생성 중 오류가 발생했습니다.");
     } finally {
       setGenerating(false);
     }
@@ -339,10 +339,10 @@ export default function Home() {
   const downloadCanvasImage = () => {
     if (!canvasRef.current || !selected) return;
     const link = document.createElement("a");
-    link.download = `cardnews-${selected.id.slice(0, 6)}.png`;
+    link.download = `feedgram-card-${selected.id.slice(0, 6)}.png`;
     link.href = canvasRef.current.toDataURL("image/png");
     link.click();
-    setToast("카드뉴스 이미지가 다운로드되었습니다! 🎨");
+    setToast("카드뉴스 PNG 이미지가 저장되었습니다! 🎨");
     setTimeout(() => setToast(null), 2500);
   };
 
@@ -359,19 +359,19 @@ export default function Home() {
       const data = await res.json();
       if (!res.ok) {
         setPostMode("error");
-        setPostResultMsg(data?.message || "게시에 실패했어요.");
+        setPostResultMsg(data?.message || "게시에 실패했습니다.");
       } else if (data.mode === "preview") {
         setPostMode("preview");
         setPostResultMsg(data.message);
       } else {
         setPostMode("posted");
-        setPostResultMsg(data.permalink ? `게시 완료: ${data.permalink}` : "게시가 완료됐어요.");
+        setPostResultMsg(data.permalink ? `게시 완료: ${data.permalink}` : "게시가 완료되었습니다.");
         setToast("인스타그램에 성공적으로 포스팅되었습니다! 🚀");
         setTimeout(() => setToast(null), 2600);
       }
     } catch {
       setPostMode("error");
-      setPostResultMsg("네트워크 오류로 게시하지 못했어요.");
+      setPostResultMsg("네트워크 오류로 게시하지 못했습니다.");
     } finally {
       setPosting(false);
     }
@@ -389,7 +389,7 @@ export default function Home() {
     setScheduledPosts((prev) => [newSchedule, ...prev]);
     setShowScheduleModal(false);
     setScheduleTime("");
-    setToast("포스팅 예약 일정이 추가되었습니다! 📅");
+    setToast("포스팅 예약 일정이 등록되었습니다! 📅");
     setTimeout(() => setToast(null), 2500);
   };
 
@@ -398,51 +398,53 @@ export default function Home() {
   };
 
   return (
-    <div className="w-full min-h-screen bg-[var(--color-bg)]">
-      {/* Top Header */}
-      <header className="sticky top-0 z-30 flex items-center justify-between px-5 sm:px-8 py-3.5 border-b bg-[var(--color-bg)]/90 backdrop-blur border-[var(--color-border)]">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 bg-[var(--color-ink)] shadow-md">
-            <Rss size={20} color="#C6F135" strokeWidth={2.5} />
+    <div className="w-full min-h-screen text-[#F1F5F9] selection:bg-purple-500 selection:text-white">
+      {/* Top Header - Glassmorphism */}
+      <header className="sticky top-0 z-30 flex items-center justify-between px-6 sm:px-10 py-4 glass-panel border-b border-white/10 shadow-2xl">
+        <div className="flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 bg-gradient-to-br from-violet-600 via-purple-600 to-pink-500 shadow-lg shadow-purple-500/25">
+            <Rss size={20} color="#FFFFFF" strokeWidth={2.5} />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <span className="font-display text-2xl text-[var(--color-ink)] leading-tight">피드그램</span>
-              <span className="px-2 py-0.5 rounded-full font-mono-ui text-[10px] font-bold bg-[#E7E2FF] text-[var(--color-primary)]">
-                Studio v2.0
+            <div className="flex items-center gap-2.5">
+              <span className="font-display text-2xl font-extrabold tracking-tight text-gradient">
+                FEED4GRAMS
+              </span>
+              <span className="px-2.5 py-0.5 rounded-full font-mono-ui text-[10px] font-bold bg-purple-500/20 border border-purple-500/30 text-purple-300">
+                Studio PRO
               </span>
             </div>
-            <p className="text-[11px] text-[var(--color-muted)] hidden sm:block">
-              RSS 큐레이션 · AI 카드뉴스 & 캡션 포스팅 오토메이션
+            <p className="text-[11px] text-slate-400 font-medium hidden sm:block">
+              RSS Feed Automation & AI Card News Publisher
             </p>
           </div>
         </div>
 
-        {/* Tab Navigation & Add Feed */}
-        <div className="flex items-center gap-2">
-          <div className="hidden sm:flex bg-[var(--color-chip)] p-1 rounded-full border border-[var(--color-border)]">
+        {/* Tab Navigation & Buttons */}
+        <div className="flex items-center gap-3">
+          <div className="hidden sm:flex bg-slate-900/80 p-1 rounded-full border border-white/10 shadow-inner">
             <button
               onClick={() => setActiveTab("editor")}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
+              className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all ${
                 activeTab === "editor"
-                  ? "bg-white text-[var(--color-ink)] shadow-sm"
-                  : "text-[var(--color-muted)] hover:text-[var(--color-ink)]"
+                  ? "bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-md shadow-purple-500/20"
+                  : "text-slate-400 hover:text-white"
               }`}
             >
               콘텐츠 큐레이터
             </button>
             <button
               onClick={() => setActiveTab("scheduler")}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
+              className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 ${
                 activeTab === "scheduler"
-                  ? "bg-white text-[var(--color-ink)] shadow-sm"
-                  : "text-[var(--color-muted)] hover:text-[var(--color-ink)]"
+                  ? "bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-md shadow-purple-500/20"
+                  : "text-slate-400 hover:text-white"
               }`}
             >
               <Calendar size={13} />
               발행 일정
               {scheduledPosts.length > 0 && (
-                <span className="w-4 h-4 rounded-full bg-[var(--color-primary)] text-white text-[9px] flex items-center justify-center">
+                <span className="w-4 h-4 rounded-full bg-pink-500 text-white text-[9px] font-extrabold flex items-center justify-center">
                   {scheduledPosts.length}
                 </span>
               )}
@@ -451,74 +453,78 @@ export default function Home() {
 
           <button
             onClick={() => setShowAddFeed(true)}
-            className="flex items-center gap-1.5 rounded-full px-4 py-2 text-xs sm:text-sm font-bold bg-[var(--color-primary)] text-white shadow-sm hover:brightness-105 transition-all"
+            className="flex items-center gap-1.5 rounded-full px-4.5 py-2 text-xs font-bold bg-gradient-to-r from-violet-600 via-purple-600 to-pink-500 text-white shadow-lg shadow-purple-500/20 hover:scale-105 active:scale-95 transition-all"
           >
-            <Plus size={16} /> 피드 추가
+            <Plus size={15} /> 피드 추가
           </button>
           <button
             onClick={() => setShowInfo(true)}
             aria-label="설정 및 안내"
-            className="w-9 h-9 rounded-full flex items-center justify-center bg-[var(--color-chip)] text-[var(--color-ink)] hover:bg-[#E2DCFF] transition-all"
+            className="w-9 h-9 rounded-full flex items-center justify-center bg-slate-800/80 border border-white/10 text-slate-300 hover:text-white hover:bg-slate-700 transition-all"
           >
             <Settings2 size={16} />
           </button>
         </div>
       </header>
 
-      {/* Main Container */}
-      <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-[240px_1fr_380px] gap-0 min-h-[calc(100vh-65px)]">
-        {/* Left Sidebar: RSS Feeds & Quick Categories */}
-        <aside className="hidden lg:block px-5 py-6 border-r border-[var(--color-border)] bg-white/40">
-          <div className="space-y-6">
-            {/* Quick Filters */}
+      {/* Main Layout Container */}
+      <div className="max-w-[1500px] mx-auto grid grid-cols-1 lg:grid-cols-[260px_1fr_400px] gap-0 min-h-[calc(100vh-73px)]">
+        {/* Left Sidebar: RSS Feeds & Quick Views */}
+        <aside className="hidden lg:block px-6 py-7 border-r border-white/5 bg-slate-950/40">
+          <div className="space-y-7">
+            {/* Quick Curation Views */}
             <div>
-              <div className="font-mono-ui text-[11px] uppercase tracking-wider mb-2.5 text-[var(--color-muted)] font-semibold">
+              <div className="font-mono-ui text-[10px] uppercase tracking-widest mb-3 text-slate-400 font-bold">
                 큐레이션 뷰
               </div>
-              <nav className="flex flex-col gap-1">
+              <nav className="flex flex-col gap-1.5">
                 <button
                   onClick={() => {
                     setActiveFeedId("all");
                     setShowBookmarksOnly(false);
                   }}
-                  className={`w-full flex items-center justify-between rounded-xl px-3 py-2 text-xs font-bold text-left transition-all ${
+                  className={`w-full flex items-center justify-between rounded-xl px-3.5 py-2.5 text-xs font-bold text-left transition-all ${
                     activeFeedId === "all" && !showBookmarksOnly
-                      ? "bg-[var(--color-ink)] text-white shadow-sm"
-                      : "text-[var(--color-ink)] hover:bg-[var(--color-chip)]"
+                      ? "bg-gradient-to-r from-violet-600/30 to-purple-600/30 border border-purple-500/50 text-white shadow-lg shadow-purple-500/10"
+                      : "text-slate-300 hover:bg-slate-800/50 hover:text-white"
                   }`}
                 >
-                  <span className="flex items-center gap-2">
-                    <Layers size={14} /> 전체 기사
+                  <span className="flex items-center gap-2.5">
+                    <Layers size={15} className="text-purple-400" /> 전체 기사
                   </span>
-                  <span className="font-mono-ui text-[11px] opacity-80">{articles.length}</span>
+                  <span className="font-mono-ui text-[11px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400">
+                    {articles.length}
+                  </span>
                 </button>
                 <button
                   onClick={() => {
                     setShowBookmarksOnly(true);
                     setActiveFeedId("all");
                   }}
-                  className={`w-full flex items-center justify-between rounded-xl px-3 py-2 text-xs font-bold text-left transition-all ${
+                  className={`w-full flex items-center justify-between rounded-xl px-3.5 py-2.5 text-xs font-bold text-left transition-all ${
                     showBookmarksOnly
-                      ? "bg-[var(--color-ink)] text-white shadow-sm"
-                      : "text-[var(--color-ink)] hover:bg-[var(--color-chip)]"
+                      ? "bg-gradient-to-r from-pink-600/30 to-purple-600/30 border border-pink-500/50 text-white shadow-lg shadow-pink-500/10"
+                      : "text-slate-300 hover:bg-slate-800/50 hover:text-white"
                   }`}
                 >
-                  <span className="flex items-center gap-2">
-                    <Bookmark size={14} className="fill-current text-[#FF6FB5]" /> 북마크함
+                  <span className="flex items-center gap-2.5">
+                    <Bookmark size={15} className="fill-pink-500 text-pink-500" /> 북마크함
                   </span>
-                  <span className="font-mono-ui text-[11px] opacity-80">{bookmarks.length}</span>
+                  <span className="font-mono-ui text-[11px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400">
+                    {bookmarks.length}
+                  </span>
                 </button>
               </nav>
             </div>
 
             {/* RSS Feed Subscriptions */}
             <div>
-              <div className="flex items-center justify-between mb-2.5">
-                <span className="font-mono-ui text-[11px] uppercase tracking-wider text-[var(--color-muted)] font-semibold">
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-mono-ui text-[10px] uppercase tracking-widest text-slate-400 font-bold">
                   구독 RSS 피드 · {feeds.length}
                 </span>
               </div>
-              <nav className="flex flex-col gap-1 max-h-[calc(100vh-320px)] overflow-y-auto fg-scroll pr-1">
+              <nav className="flex flex-col gap-1.5 max-h-[calc(100vh-340px)] overflow-y-auto fg-scroll pr-1">
                 {feeds.map((f) => (
                   <div key={f.id} className="group relative">
                     <button
@@ -526,18 +532,18 @@ export default function Home() {
                         setActiveFeedId(f.id);
                         setShowBookmarksOnly(false);
                       }}
-                      className={`w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold text-left pr-7 transition-all ${
+                      className={`w-full flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-xs font-bold text-left pr-8 transition-all ${
                         activeFeedId === f.id && !showBookmarksOnly
-                          ? "bg-[var(--color-ink)] text-white shadow-sm"
-                          : "text-[var(--color-ink)] hover:bg-[var(--color-chip)]"
+                          ? "bg-slate-800/90 border border-white/10 text-white shadow-md"
+                          : "text-slate-400 hover:bg-slate-800/40 hover:text-slate-200"
                       }`}
                     >
                       {f.loading ? (
-                        <Loader2 size={12} className="fg-spin shrink-0" style={{ color: f.color }} />
+                        <Loader2 size={13} className="fg-spin shrink-0 text-purple-400" />
                       ) : (
                         <span
-                          className="w-2.5 h-2.5 rounded-full shrink-0"
-                          style={{ background: f.color, boxShadow: `0 0 0 3px ${f.color}22` }}
+                          className="w-2.5 h-2.5 rounded-full shrink-0 shadow-sm"
+                          style={{ background: f.color, boxShadow: `0 0 8px ${f.color}88` }}
                         />
                       )}
                       <span className="truncate flex-1">{f.name}</span>
@@ -545,18 +551,16 @@ export default function Home() {
                     <button
                       onClick={() => removeFeed(f.id)}
                       aria-label={`${f.name} 피드 삭제`}
-                      className={`absolute right-1.5 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 w-5 h-5 rounded-full flex items-center justify-center transition-all ${
-                        activeFeedId === f.id ? "text-white" : "text-[var(--color-muted)] hover:text-red-500"
-                      }`}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 w-5 h-5 rounded-full flex items-center justify-center text-slate-500 hover:text-red-400 transition-all"
                     >
                       <X size={13} />
                     </button>
                     {f.error && (
-                      <div className="flex items-center justify-between pl-3 pr-1 mt-0.5">
-                        <span className="text-[10px] text-[var(--color-coral)]">{f.errorMsg || "실패"}</span>
+                      <div className="flex items-center justify-between pl-3 pr-2 mt-1">
+                        <span className="text-[10px] text-red-400">{f.errorMsg || "오류"}</span>
                         <button
                           onClick={() => loadFeed(f)}
-                          className="text-[10px] font-semibold underline text-[var(--color-primary)]"
+                          className="text-[10px] font-bold text-purple-400 hover:underline"
                         >
                           재시도
                         </button>
@@ -565,37 +569,32 @@ export default function Home() {
                   </div>
                 ))}
               </nav>
-              {feeds.length === 0 && (
-                <p className="text-xs mt-3 text-[var(--color-muted)]">
-                  등록된 피드가 없어요. 상단의 &apos;피드 추가&apos;로 시작하세요.
-                </p>
-              )}
             </div>
           </div>
         </aside>
 
-        {/* Center Panel: Articles Grid / Scheduler View */}
-        <main className="px-5 sm:px-8 py-6">
+        {/* Center Main Content Area */}
+        <main className="px-6 sm:px-10 py-7">
           {activeTab === "scheduler" ? (
             <div className="space-y-6">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between border-b border-white/5 pb-4">
                 <div>
-                  <h1 className="font-display text-xl text-[var(--color-ink)] flex items-center gap-2">
-                    <Calendar size={20} className="text-[var(--color-primary)]" />
+                  <h1 className="font-display text-xl font-bold text-white flex items-center gap-2.5">
+                    <Calendar size={22} className="text-purple-400" />
                     인스타그램 포스팅 예약 대기열
                   </h1>
-                  <p className="text-xs text-[var(--color-muted)] mt-1">
-                    예약된 포스팅 카드와 콘텐츠 일정을 한눈에 관리하세요.
+                  <p className="text-xs text-slate-400 mt-1">
+                    스케줄링된 카드뉴스 발행 일정을 한눈에 관리합니다.
                   </p>
                 </div>
               </div>
 
               {scheduledPosts.length === 0 ? (
-                <div className="rounded-3xl border-2 border-dashed border-[#DCD3FF] flex flex-col items-center justify-center text-center py-16 px-6 bg-white/50">
-                  <Calendar size={32} color="#B8A6FF" />
-                  <p className="mt-3 font-semibold text-[var(--color-ink)]">예약된 포스팅이 없습니다</p>
-                  <p className="text-xs mt-1 text-[var(--color-muted)]">
-                    우측 인스타그램 미리보기에서 &apos;포스팅 예약&apos; 버튼을 통해 일정을 등록해 보세요.
+                <div className="rounded-3xl border border-dashed border-white/10 flex flex-col items-center justify-center text-center py-20 px-6 bg-slate-900/30 backdrop-blur">
+                  <Calendar size={36} className="text-purple-400/50 mb-3" />
+                  <p className="font-bold text-slate-200">예약된 포스팅이 없습니다</p>
+                  <p className="text-xs mt-1 text-slate-400">
+                    우측 AI Studio 미리보기 창에서 &apos;포스팅 예약&apos; 버튼으로 일정을 추가해 보세요.
                   </p>
                 </div>
               ) : (
@@ -603,28 +602,31 @@ export default function Home() {
                   {scheduledPosts.map((sp) => (
                     <div
                       key={sp.id}
-                      className="p-4 rounded-2xl bg-white border border-[var(--color-border)] shadow-sm flex flex-col justify-between"
+                      className="p-5 rounded-2xl glass-panel border border-white/10 hover:border-purple-500/40 transition-all flex flex-col justify-between"
                     >
                       <div>
-                        <div className="flex items-center justify-between text-xs font-mono-ui mb-2">
-                          <span className="px-2 py-0.5 rounded-md bg-[#F0ECFF] text-[var(--color-primary)] font-bold">
+                        <div className="flex items-center justify-between text-xs font-mono-ui mb-3">
+                          <span className="px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30">
                             {sp.feedName}
                           </span>
-                          <span className="text-[var(--color-muted)] flex items-center gap-1">
-                            <Clock size={12} /> {sp.scheduledTime}
+                          <span className="text-slate-400 flex items-center gap-1.5">
+                            <Clock size={13} className="text-purple-400" /> {sp.scheduledTime}
                           </span>
                         </div>
-                        <h4 className="font-bold text-sm text-[var(--color-ink)] line-clamp-2">{sp.articleTitle}</h4>
+                        <h4 className="font-bold text-sm text-slate-100 line-clamp-2 leading-snug">
+                          {sp.articleTitle}
+                        </h4>
                       </div>
-                      <div className="flex items-center justify-between mt-4 pt-3 border-t border-[var(--color-border)]">
-                        <span className="text-[11px] font-semibold text-[#38D9A9] flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#38D9A9]" /> 예약 완료
+                      <div className="flex items-center justify-between mt-5 pt-3 border-t border-white/5">
+                        <span className="text-[11px] font-bold text-emerald-400 flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50" />{" "}
+                          예약 됨
                         </span>
                         <button
                           onClick={() => removeSchedule(sp.id)}
-                          className="text-xs text-[var(--color-muted)] hover:text-red-500 flex items-center gap-1"
+                          className="text-xs text-slate-400 hover:text-red-400 flex items-center gap-1 transition-colors"
                         >
-                          <Trash2 size={13} /> 취소
+                          <Trash2 size={13} /> 예약 취소
                         </button>
                       </div>
                     </div>
@@ -634,96 +636,77 @@ export default function Home() {
             </div>
           ) : (
             <>
-              {/* Search Bar & Filter Header */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mb-5">
-                <div className="relative flex-1 max-w-md">
-                  <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--color-muted)]" />
+              {/* Filter Header & Search Bar */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-6">
+                <div className="relative flex-1 max-w-lg">
+                  <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="기사 제목 또는 내용 실시간 검색..."
-                    className="w-full pl-10 pr-4 py-2.5 text-xs font-semibold rounded-2xl bg-white border border-[var(--color-border)] focus:outline-none focus:border-[var(--color-primary)] shadow-sm transition-all"
+                    placeholder="실시간 기사 검색 (제목, 요약 키워드)..."
+                    className="w-full pl-11 pr-4 py-2.5 text-xs font-semibold rounded-2xl bg-slate-900/90 border border-white/10 text-slate-100 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 shadow-inner transition-all placeholder:text-slate-500"
                   />
                   {searchQuery && (
                     <button
                       onClick={() => setSearchQuery("")}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[var(--color-muted)]"
+                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-white"
                     >
                       <X size={14} />
                     </button>
                   )}
                 </div>
 
-                <div className="flex items-center justify-between sm:justify-end gap-2">
-                  <span className="text-xs font-mono-ui font-bold text-[var(--color-muted)]">
-                    {filteredArticles.length}개 기사
+                <div className="flex items-center justify-between sm:justify-end gap-3">
+                  <span className="text-xs font-mono-ui font-bold text-slate-400">
+                    {filteredArticles.length} Articles
                   </span>
                   {loadingCount > 0 && (
-                    <span className="flex items-center gap-1.5 text-xs font-mono-ui text-[var(--color-primary)]">
-                      <Loader2 size={13} className="fg-spin" /> 불러오는 중
+                    <span className="flex items-center gap-1.5 text-xs font-mono-ui text-purple-400">
+                      <Loader2 size={13} className="fg-spin" /> Fetching
                     </span>
                   )}
                 </div>
               </div>
 
-              {/* Mobile Feed Horizontal Filter Chips */}
-              <div className="flex lg:hidden gap-2 overflow-x-auto fg-scroll pb-3 mb-2 -mx-1 px-1">
+              {/* Mobile Filter Chips */}
+              <div className="flex lg:hidden gap-2 overflow-x-auto fg-scroll pb-3 mb-3 -mx-1 px-1">
                 <button
                   onClick={() => {
                     setActiveFeedId("all");
                     setShowBookmarksOnly(false);
                   }}
-                  className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-bold ${
+                  className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-bold ${
                     activeFeedId === "all" && !showBookmarksOnly
-                      ? "bg-[var(--color-ink)] text-white"
-                      : "bg-[var(--color-chip)] text-[var(--color-ink)]"
+                      ? "bg-purple-600 text-white"
+                      : "bg-slate-800 text-slate-300"
                   }`}
                 >
                   전체
                 </button>
                 <button
                   onClick={() => setShowBookmarksOnly(!showBookmarksOnly)}
-                  className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-bold flex items-center gap-1 ${
-                    showBookmarksOnly
-                      ? "bg-[var(--color-ink)] text-white"
-                      : "bg-[var(--color-chip)] text-[var(--color-ink)]"
+                  className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-bold flex items-center gap-1.5 ${
+                    showBookmarksOnly ? "bg-pink-600 text-white" : "bg-slate-800 text-slate-300"
                   }`}
                 >
                   <Bookmark size={12} className="fill-current" /> 북마크 ({bookmarks.length})
                 </button>
-                {feeds.map((f) => (
-                  <button
-                    key={f.id}
-                    onClick={() => {
-                      setActiveFeedId(f.id);
-                      setShowBookmarksOnly(false);
-                    }}
-                    className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-bold flex items-center gap-1.5 ${
-                      activeFeedId === f.id && !showBookmarksOnly
-                        ? "bg-[var(--color-ink)] text-white"
-                        : "bg-[var(--color-chip)] text-[var(--color-ink)]"
-                    }`}
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full" style={{ background: f.color }} />
-                    {f.name}
-                  </button>
-                ))}
               </div>
 
-              {/* Empty State */}
+              {/* Empty state */}
               {filteredArticles.length === 0 && loadingCount === 0 && (
-                <div className="rounded-3xl border-2 border-dashed border-[#DCD3FF] flex flex-col items-center justify-center text-center py-16 px-6 bg-white/40">
-                  <Rss size={32} color="#B8A6FF" />
-                  <p className="mt-3 font-bold text-[var(--color-ink)]">조건에 해당하는 기사가 없습니다</p>
-                  <p className="text-xs mt-1 text-[var(--color-muted)]">
-                    {searchQuery ? "다른 검색어로 입력해 보세요." : "새로운 RSS 주소를 등록해 주세요."}
+                <div className="rounded-3xl border border-dashed border-white/10 flex flex-col items-center justify-center text-center py-20 px-6 bg-slate-900/30">
+                  <Rss size={36} className="text-purple-400/40 mb-3" />
+                  <p className="font-bold text-slate-200">기사를 찾지 못했습니다</p>
+                  <p className="text-xs mt-1 text-slate-400">
+                    {searchQuery ? "다른 검색어를 입력해 보세요." : "상단의 '피드 추가' 버튼으로 새 RSS를 등록해 보세요."}
                   </p>
                 </div>
               )}
 
               {/* Articles Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
                 {filteredArticles.map((a) => {
                   const f = feedById(a.feedId);
                   const isSelected = selected?.id === a.id;
@@ -733,32 +716,29 @@ export default function Home() {
                     <div
                       key={a.id}
                       onClick={() => selectArticle(a)}
-                      className="fg-card cursor-pointer group text-left rounded-2xl overflow-hidden bg-white flex flex-col relative transition-all duration-200 hover:-translate-y-1"
-                      style={{
-                        boxShadow: isSelected
-                          ? "0 0 0 2.5px #7C5CFF, 0 10px 25px -5px rgba(124,92,255,0.2)"
-                          : "0 1px 3px rgba(28,23,48,0.06)",
-                      }}
+                      className={`fg-card cursor-pointer group text-left rounded-2xl overflow-hidden glass-panel flex flex-col relative transition-all duration-300 ${
+                        isSelected ? "glass-panel-glow" : ""
+                      }`}
                     >
-                      <div className="relative w-full aspect-[16/10] bg-[var(--color-chip)] overflow-hidden">
+                      <div className="relative w-full aspect-[16/10] bg-slate-900 overflow-hidden">
                         {a.image ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
                             src={a.image}
                             alt=""
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                             loading="lazy"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#F5F2FF] to-[#EAE4FF]">
-                            <Rss size={24} color="#B8A6FF" />
+                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-900 via-purple-950/40 to-slate-900">
+                            <Rss size={28} className="text-purple-400/40" />
                           </div>
                         )}
 
                         {/* Feed Badge */}
                         <span
-                          className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-full text-[10px] font-bold font-mono-ui flex items-center gap-1.5 bg-white/90 backdrop-blur shadow-sm"
-                          style={{ color: f?.color || "#1C1730" }}
+                          className="absolute top-3 left-3 px-2.5 py-1 rounded-full text-[10px] font-bold font-mono-ui flex items-center gap-1.5 bg-slate-950/80 backdrop-blur border border-white/10 shadow-lg"
+                          style={{ color: f?.color || "#8B5CF6" }}
                         >
                           <span className="w-1.5 h-1.5 rounded-full" style={{ background: f?.color }} />
                           {f?.name}
@@ -768,26 +748,28 @@ export default function Home() {
                         <button
                           onClick={(e) => toggleBookmark(a.id, e)}
                           aria-label="북마크"
-                          className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center shadow-sm hover:scale-110 transition-all"
+                          className="absolute top-3 right-3 w-8 h-8 rounded-full bg-slate-950/80 backdrop-blur border border-white/10 flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all"
                         >
                           <Bookmark
                             size={14}
-                            className={isBookmarked ? "fill-[#FF6FB5] text-[#FF6FB5]" : "text-[var(--color-muted)]"}
+                            className={isBookmarked ? "fill-pink-500 text-pink-500" : "text-slate-400"}
                           />
                         </button>
                       </div>
 
-                      <div className="p-4 flex flex-col gap-1.5 flex-1">
-                        <h3 className="text-xs sm:text-sm font-bold leading-snug line-clamp-2 text-[var(--color-ink)] group-hover:text-[var(--color-primary)] transition-colors">
+                      <div className="p-4.5 flex flex-col gap-2 flex-1">
+                        <h3 className="text-xs sm:text-sm font-bold leading-snug line-clamp-2 text-slate-100 group-hover:text-purple-300 transition-colors">
                           {a.title}
                         </h3>
                         {a.description && (
-                          <p className="text-xs line-clamp-2 text-[var(--color-muted)] leading-normal">{a.description}</p>
+                          <p className="text-xs line-clamp-2 text-slate-400 leading-normal font-medium">
+                            {a.description}
+                          </p>
                         )}
-                        <div className="mt-auto pt-2 flex items-center justify-between text-[11px] font-mono-ui text-[var(--color-muted-2)]">
+                        <div className="mt-auto pt-3 flex items-center justify-between text-[11px] font-mono-ui text-slate-400">
                           <span>{timeAgo(a.pubDate)}</span>
-                          <span className="text-[10px] text-[var(--color-primary)] opacity-0 group-hover:opacity-100 font-bold transition-opacity">
-                            카드뉴스 편집 ▶
+                          <span className="text-[10px] text-purple-400 font-bold opacity-0 group-hover:opacity-100 transition-opacity">
+                            카드 편집 ▶
                           </span>
                         </div>
                       </div>
@@ -799,97 +781,97 @@ export default function Home() {
           )}
         </main>
 
-        {/* Right Sidebar: Instagram Preview & AI Caption Studio */}
-        <aside className="px-5 sm:px-8 py-6 lg:border-l lg:sticky lg:top-[65px] lg:h-[calc(100vh-65px)] overflow-y-auto fg-scroll border-[var(--color-border)] bg-white/60">
-          <div className="flex items-center justify-between mb-3">
-            <div className="font-mono-ui text-[11px] uppercase tracking-wider text-[var(--color-muted)] font-bold flex items-center gap-1.5">
-              <Camera size={14} className="text-[var(--color-primary)]" />
+        {/* Right Sidebar: Instagram Preview & AI Studio */}
+        <aside className="px-6 sm:px-8 py-7 lg:border-l lg:border-white/5 lg:sticky lg:top-[73px] lg:h-[calc(100vh-73px)] overflow-y-auto fg-scroll bg-slate-950/60">
+          <div className="flex items-center justify-between mb-4">
+            <div className="font-mono-ui text-[11px] uppercase tracking-wider text-slate-400 font-bold flex items-center gap-2">
+              <Camera size={15} className="text-purple-400" />
               인스타그램 카드 & AI Studio
             </div>
           </div>
 
           {!selected ? (
-            <div className="rounded-3xl border-2 border-dashed border-[#DCD3FF] flex flex-col items-center justify-center text-center py-16 px-4 bg-white/40">
-              <Camera size={28} color="#B8A6FF" />
-              <p className="text-xs font-bold mt-3 text-[var(--color-ink)]">기사를 선택해 주세요</p>
-              <p className="text-[11px] mt-1 text-[var(--color-muted)]">
-                기사 카드를 클릭하면 실시간 인스타그램 카드뉴스 템플릿과 AI 캡션 조율이 가능합니다.
+            <div className="rounded-3xl border border-dashed border-white/10 flex flex-col items-center justify-center text-center py-20 px-5 glass-panel">
+              <Camera size={32} className="text-purple-400/40 mb-3" />
+              <p className="text-xs font-bold text-slate-200">기사를 선택하세요</p>
+              <p className="text-[11px] mt-1 text-slate-400 leading-normal">
+                왼쪽 목록에서 기사를 클릭하면 실시간 카드뉴스 제작 템플릿과 AI 캡션을 설정할 수 있습니다.
               </p>
             </div>
           ) : (
-            <div className="fg-pop space-y-4">
-              {/* Instagram Card Preview Container */}
+            <div className="fg-pop space-y-5">
+              {/* Instagram Card Preview Frame */}
               <div
-                className="rounded-[2rem] p-3 mx-auto bg-[var(--color-ink)] relative"
-                style={{ maxWidth: 320, boxShadow: "0 20px 40px -16px rgba(28,23,48,0.35)" }}
+                className="rounded-[2.2rem] p-3 mx-auto bg-slate-950 border border-white/15 relative shadow-2xl"
+                style={{ maxWidth: 330 }}
               >
-                <div className="rounded-[1.6rem] overflow-hidden bg-white">
-                  <div className="flex items-center justify-between px-3 py-2.5">
+                <div className="rounded-[1.7rem] overflow-hidden bg-slate-900 border border-white/10">
+                  <div className="flex items-center justify-between px-3.5 py-2.5 border-b border-white/5 bg-slate-950">
                     <div className="flex items-center gap-2">
                       <div
-                        className="w-7 h-7 rounded-full shrink-0"
-                        style={{ background: "linear-gradient(135deg, #FF6B6B, #7C5CFF, #4CC9F0)" }}
+                        className="w-7 h-7 rounded-full shrink-0 shadow-md"
+                        style={{ background: "linear-gradient(135deg, #EC4899, #8B5CF6, #06B6D4)" }}
                       />
-                      <span className="text-xs font-bold text-[var(--color-ink)]">
-                        {feedById(selected.feedId)?.name?.toLowerCase().replace(/\s+/g, "") || "myfeed"}
+                      <span className="text-xs font-bold text-slate-200">
+                        {feedById(selected.feedId)?.name?.toLowerCase().replace(/\s+/g, "") || "feed4grams"}
                       </span>
                     </div>
-                    <span className="text-[10px] font-mono-ui px-2 py-0.5 rounded-full bg-gray-100 font-bold text-gray-600">
+                    <span className="text-[9px] font-mono-ui px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-bold border border-purple-500/30">
                       {cardTheme.toUpperCase()}
                     </span>
                   </div>
 
-                  {/* Dynamic Image Area */}
-                  <div className="w-full aspect-square bg-[var(--color-chip)] relative overflow-hidden flex items-center justify-center">
+                  {/* Card Image Box */}
+                  <div className="w-full aspect-square bg-slate-950 relative overflow-hidden flex items-center justify-center">
                     {selected.image ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={selected.image} alt="" className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full p-5 flex flex-col items-center justify-center text-center bg-gradient-to-br from-[#1C1730] to-[#342A5C] text-white">
-                        <span className="font-display text-base leading-tight font-bold line-clamp-4">
+                      <div className="w-full h-full p-6 flex flex-col items-center justify-center text-center bg-gradient-to-br from-slate-950 via-purple-950/60 to-slate-950 text-white">
+                        <span className="font-display text-lg font-bold leading-snug line-clamp-4">
                           {selected.title}
                         </span>
                       </div>
                     )}
                   </div>
 
-                  <div className="flex items-center justify-between px-3 pt-2.5">
+                  <div className="flex items-center justify-between px-3.5 pt-3">
                     <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 rounded-full border-2 border-[var(--color-ink)]" />
-                      <div className="w-4 h-4 rounded-full border-2 border-[var(--color-ink)]" />
-                      <div className="w-4 h-4 rounded-full border-2 border-[var(--color-ink)]" />
+                      <div className="w-4 h-4 rounded-full border-2 border-slate-400" />
+                      <div className="w-4 h-4 rounded-full border-2 border-slate-400" />
+                      <div className="w-4 h-4 rounded-full border-2 border-slate-400" />
                     </div>
                     <button
                       onClick={() => setShowCardCanvasModal(true)}
-                      className="text-[10px] font-bold text-[var(--color-primary)] flex items-center gap-1 hover:underline"
+                      className="text-[10px] font-bold text-purple-400 hover:text-purple-300 flex items-center gap-1 transition-colors"
                     >
-                      <Palette size={12} /> 카드 고화질 변환
+                      <Palette size={12} /> 고화질 템플릿 변환
                     </button>
                   </div>
 
-                  <div className="px-3 py-2.5 text-[11px] leading-relaxed text-[var(--color-ink)]">
-                    <span className="font-bold mr-1">
-                      {feedById(selected.feedId)?.name?.toLowerCase().replace(/\s+/g, "") || "myfeed"}
+                  <div className="px-3.5 py-3 text-[11px] leading-relaxed text-slate-200 font-medium">
+                    <span className="font-bold mr-1 text-purple-300">
+                      {feedById(selected.feedId)?.name?.toLowerCase().replace(/\s+/g, "") || "feed4grams"}
                     </span>
                     {caption ? (
-                      <span className="whitespace-pre-wrap">{caption}</span>
+                      <span className="whitespace-pre-wrap text-slate-300">{caption}</span>
                     ) : (
-                      <span className="text-[var(--color-muted-2)] font-mono-ui">
-                        아래 톤앤매너 버튼을 눌러 AI 캡션을 생성해 보세요 ✨
+                      <span className="text-slate-400 font-mono-ui text-[10px]">
+                        아래 톤앤매너를 선택하여 AI 캡션을 생성해 보세요 ✨
                       </span>
                     )}
                   </div>
                 </div>
               </div>
 
-              {/* AI Multi-Tone Selection */}
-              <div className="p-3.5 rounded-2xl bg-white border border-[var(--color-border)] shadow-sm space-y-2.5">
-                <label className="text-xs font-bold text-[var(--color-ink)] flex items-center gap-1.5">
-                  <Sparkles size={14} className="text-[var(--color-primary)]" />
+              {/* AI Multi-Tone Captions Studio */}
+              <div className="p-4 rounded-2xl glass-panel border border-white/10 space-y-3 shadow-xl">
+                <label className="text-xs font-bold text-slate-200 flex items-center gap-2">
+                  <Sparkles size={15} className="text-purple-400" />
                   AI 캡션 톤앤매너 선택
                 </label>
 
-                <div className="grid grid-cols-2 gap-1.5">
+                <div className="grid grid-cols-2 gap-2">
                   {[
                     { key: "professional", label: "💼 비즈니스 뉴스" },
                     { key: "trendy", label: "🔥 트렌디 숏폼" },
@@ -900,10 +882,10 @@ export default function Home() {
                       key={t.key}
                       onClick={() => generateCaption(t.key as CaptionTone)}
                       disabled={generating}
-                      className={`py-1.5 px-2 rounded-xl text-xs font-bold border transition-all text-left flex items-center gap-1 ${
+                      className={`py-2 px-2.5 rounded-xl text-xs font-bold border transition-all text-left flex items-center gap-1.5 ${
                         captionTone === t.key
-                          ? "border-[var(--color-primary)] bg-[#F5F2FF] text-[var(--color-primary)] shadow-sm"
-                          : "border-gray-200 hover:border-gray-300 text-[var(--color-ink)]"
+                          ? "border-purple-500 bg-purple-500/20 text-purple-300 shadow-md shadow-purple-500/10"
+                          : "border-white/5 bg-slate-900/60 text-slate-400 hover:border-white/15 hover:text-white"
                       }`}
                     >
                       {t.label}
@@ -914,28 +896,33 @@ export default function Home() {
                 <button
                   onClick={() => generateCaption(captionTone)}
                   disabled={generating}
-                  className="w-full mt-1 flex items-center justify-center gap-2 rounded-xl py-2 text-xs font-bold disabled:opacity-60 bg-[var(--color-primary)] text-white shadow-sm hover:brightness-105"
+                  className="w-full mt-1 flex items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold disabled:opacity-60 bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-md shadow-purple-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
                 >
-                  {generating ? <Loader2 size={13} className="fg-spin" /> : <Sparkles size={13} />}
-                  {generating ? "캡션 생성 중..." : "AI 캡션 다시 생성"}
+                  {generating ? <Loader2 size={14} className="fg-spin" /> : <Sparkles size={14} />}
+                  {generating ? "캡션 작성 중..." : "AI 캡션 다시 생성"}
                 </button>
               </div>
 
-              {/* Action Buttons: Card News Canvas / Post / Schedule */}
-              <div className="flex flex-col gap-2">
+              {/* Action Buttons */}
+              <div className="flex flex-col gap-2.5">
                 <button
                   onClick={() => setShowCardCanvasModal(true)}
-                  className="w-full flex items-center justify-center gap-2 rounded-full py-2.5 text-xs font-bold bg-[#EFEAFF] text-[var(--color-primary)] hover:bg-[#E5DDFF] transition-all"
+                  className="w-full flex items-center justify-center gap-2 rounded-full py-3 text-xs font-bold bg-slate-900 border border-purple-500/40 text-purple-300 hover:bg-purple-950/40 hover:border-purple-500 transition-all shadow-lg"
                 >
-                  <Palette size={14} /> 카드뉴스 템플릿 제작 & PNG 다운로드
+                  <Palette size={15} /> 카드뉴스 템플릿 제작 & PNG 다운로드
                 </button>
 
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2.5">
                   <button
                     onClick={handlePost}
                     disabled={posting}
-                    className="flex items-center justify-center gap-1.5 rounded-full py-2.5 text-xs font-bold disabled:opacity-70 text-white shadow-sm"
-                    style={{ background: postMode === "posted" ? "#38D9A9" : "#1C1730" }}
+                    className="flex items-center justify-center gap-2 rounded-full py-3 text-xs font-bold disabled:opacity-70 text-white shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98]"
+                    style={{
+                      background:
+                        postMode === "posted"
+                          ? "#10B981"
+                          : "linear-gradient(135deg, #EC4899, #8B5CF6)",
+                    }}
                   >
                     {posting ? (
                       <Loader2 size={14} className="fg-spin" />
@@ -949,7 +936,7 @@ export default function Home() {
 
                   <button
                     onClick={() => setShowScheduleModal(true)}
-                    className="flex items-center justify-center gap-1.5 rounded-full py-2.5 text-xs font-bold border border-[var(--color-border)] bg-white text-[var(--color-ink)] hover:bg-gray-50 shadow-sm"
+                    className="flex items-center justify-center gap-2 rounded-full py-3 text-xs font-bold border border-white/10 bg-slate-900 text-slate-200 hover:bg-slate-800 transition-all shadow-md"
                   >
                     <Calendar size={14} /> 포스팅 예약
                   </button>
@@ -958,7 +945,7 @@ export default function Home() {
                 {postResultMsg && (
                   <p
                     className="text-[11px] leading-relaxed px-1 text-center font-medium"
-                    style={{ color: postMode === "error" ? "#FF6B6B" : "#8A80B0" }}
+                    style={{ color: postMode === "error" ? "#F43F5E" : "#94A3B8" }}
                   >
                     {postResultMsg}
                   </p>
@@ -968,9 +955,9 @@ export default function Home() {
                   href={selected.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-1.5 text-xs font-bold py-1 text-[var(--color-muted)] hover:text-[var(--color-ink)]"
+                  className="flex items-center justify-center gap-1.5 text-xs font-bold py-1 text-slate-400 hover:text-white transition-colors"
                 >
-                  원문 기사 전문 확인 <ExternalLink size={12} />
+                  원문 기사 전문 확인 <ExternalLink size={13} />
                 </a>
               </div>
             </div>
@@ -981,31 +968,31 @@ export default function Home() {
       {/* 🎨 Card News Canvas Generator Modal */}
       {showCardCanvasModal && selected && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[rgba(18,19,26,0.65)] backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md"
           onClick={() => setShowCardCanvasModal(false)}
         >
           <div
-            className="fg-pop w-full max-w-xl rounded-3xl bg-white p-6 shadow-2xl space-y-4 overflow-y-auto max-h-[90vh]"
+            className="fg-pop w-full max-w-xl rounded-3xl glass-panel-glow p-7 shadow-2xl space-y-5 overflow-y-auto max-h-[90vh]"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between border-b pb-3">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
               <div>
-                <h2 className="font-display text-lg text-[var(--color-ink)] flex items-center gap-2">
-                  <Palette size={18} className="text-[var(--color-primary)]" />
-                  인스타그램 고화질 카드뉴스 제작 Studio
+                <h2 className="font-display text-xl font-bold text-white flex items-center gap-2.5">
+                  <Palette size={20} className="text-purple-400" />
+                  카드뉴스 고화질 이미지 Studio
                 </h2>
-                <p className="text-xs text-[var(--color-muted)]">템플릿 테마와 비율을 선택해 이미지로 바로 저장하세요.</p>
+                <p className="text-xs text-slate-400 mt-0.5">원하는 템플릿 테마와 인스타그램 비율을 지정하세요.</p>
               </div>
-              <button onClick={() => setShowCardCanvasModal(false)}>
-                <X size={20} color="#8A80B0" />
+              <button onClick={() => setShowCardCanvasModal(false)} className="text-slate-400 hover:text-white">
+                <X size={20} />
               </button>
             </div>
 
             {/* Template controls */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-xs font-bold text-[var(--color-ink)] mb-1 block">디자인 템플릿 테마</label>
-                <div className="grid grid-cols-2 gap-1.5">
+                <label className="text-xs font-bold text-slate-300 mb-2 block">디자인 템플릿 테마</label>
+                <div className="grid grid-cols-2 gap-2">
                   {[
                     { key: "dark", label: "🌙 모던 짙은" },
                     { key: "cream", label: "📜 크림 매거진" },
@@ -1015,10 +1002,10 @@ export default function Home() {
                     <button
                       key={t.key}
                       onClick={() => setCardTheme(t.key as CardTemplateTheme)}
-                      className={`py-1.5 px-2 rounded-xl text-xs font-bold border ${
+                      className={`py-2 px-2.5 rounded-xl text-xs font-bold border transition-all ${
                         cardTheme === t.key
-                          ? "border-[var(--color-primary)] bg-[#F5F2FF] text-[var(--color-primary)]"
-                          : "border-gray-200 text-gray-700"
+                          ? "border-purple-500 bg-purple-500/20 text-purple-300 shadow-md"
+                          : "border-white/10 bg-slate-900/60 text-slate-400 hover:text-white"
                       }`}
                     >
                       {t.label}
@@ -1028,8 +1015,8 @@ export default function Home() {
               </div>
 
               <div>
-                <label className="text-xs font-bold text-[var(--color-ink)] mb-1 block">인스타그램 비율</label>
-                <div className="grid grid-cols-2 gap-1.5">
+                <label className="text-xs font-bold text-slate-300 mb-2 block">인스타그램 비율</label>
+                <div className="grid grid-cols-2 gap-2">
                   {[
                     { key: "1:1", label: "정사각형 1:1" },
                     { key: "4:5", label: "피드 세로 4:5" },
@@ -1037,10 +1024,10 @@ export default function Home() {
                     <button
                       key={r.key}
                       onClick={() => setCardAspectRatio(r.key as CardAspectRatio)}
-                      className={`py-1.5 px-2 rounded-xl text-xs font-bold border ${
+                      className={`py-2 px-2.5 rounded-xl text-xs font-bold border transition-all ${
                         cardAspectRatio === r.key
-                          ? "border-[var(--color-primary)] bg-[#F5F2FF] text-[var(--color-primary)]"
-                          : "border-gray-200 text-gray-700"
+                          ? "border-purple-500 bg-purple-500/20 text-purple-300 shadow-md"
+                          : "border-white/10 bg-slate-900/60 text-slate-400 hover:text-white"
                       }`}
                     >
                       {r.label}
@@ -1050,21 +1037,21 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Canvas Rendering Preview Area */}
-            <div className="flex flex-col items-center justify-center p-3 bg-gray-900 rounded-2xl">
+            {/* Canvas Preview */}
+            <div className="flex flex-col items-center justify-center p-4 bg-slate-950 rounded-2xl border border-white/10">
               <canvas
                 ref={canvasRef}
-                className="max-w-full h-auto rounded-xl shadow-lg border border-gray-700"
-                style={{ maxHeight: "400px" }}
+                className="max-w-full h-auto rounded-xl shadow-2xl border border-white/10"
+                style={{ maxHeight: "380px" }}
               />
             </div>
 
-            <div className="flex gap-2 pt-2">
+            <div className="flex gap-3 pt-2">
               <button
                 onClick={downloadCanvasImage}
-                className="flex-1 py-3 rounded-full text-xs font-bold bg-[var(--color-primary)] text-white flex items-center justify-center gap-2 shadow-md hover:brightness-105"
+                className="flex-1 py-3.5 rounded-full text-xs font-bold bg-gradient-to-r from-violet-600 via-purple-600 to-pink-500 text-white flex items-center justify-center gap-2 shadow-xl shadow-purple-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
               >
-                <Download size={15} /> 카드뉴스 PNG 다운로드
+                <Download size={16} /> 카드뉴스 PNG 고화질 다운로드
               </button>
             </div>
           </div>
@@ -1074,37 +1061,37 @@ export default function Home() {
       {/* 📅 Post Scheduler Modal */}
       {showScheduleModal && selected && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-5 bg-[rgba(28,23,48,0.45)] backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-5 bg-slate-950/80 backdrop-blur-md"
           onClick={() => setShowScheduleModal(false)}
         >
-          <div className="fg-pop w-full max-w-sm rounded-3xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-display text-lg text-[var(--color-ink)] flex items-center gap-2">
-                <Calendar size={18} className="text-[var(--color-primary)]" /> 포스팅 일정 예약
+          <div className="fg-pop w-full max-w-sm rounded-3xl glass-panel-glow p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
+              <h2 className="font-display text-lg font-bold text-white flex items-center gap-2">
+                <Calendar size={18} className="text-purple-400" /> 포스팅 일정 예약
               </h2>
-              <button onClick={() => setShowScheduleModal(false)}>
-                <X size={18} color="#8A80B0" />
+              <button onClick={() => setShowScheduleModal(false)} className="text-slate-400 hover:text-white">
+                <X size={18} />
               </button>
             </div>
 
-            <p className="text-xs text-[var(--color-muted)] mb-3 leading-normal">
-              선택한 기사: <span className="font-bold text-[var(--color-ink)]">{selected.title}</span>
+            <p className="text-xs text-slate-400 mb-4 leading-normal">
+              대상 기사: <span className="font-bold text-slate-200">{selected.title}</span>
             </p>
 
-            <label className="text-xs font-bold text-[var(--color-ink)]">발행 일시 선택</label>
+            <label className="text-xs font-bold text-slate-300 block mb-1">발행 일시 지정</label>
             <input
               type="datetime-local"
               value={scheduleTime}
               onChange={(e) => setScheduleTime(e.target.value)}
-              className="w-full mt-1.5 mb-4 rounded-xl px-3.5 py-2.5 text-xs font-mono-ui bg-[var(--color-bg)] border border-[var(--color-border)] text-[var(--color-ink)] font-semibold"
+              className="w-full mt-1 mb-5 rounded-xl px-3.5 py-2.5 text-xs font-mono-ui bg-slate-900 border border-white/10 text-white font-semibold focus:outline-none focus:border-purple-500"
             />
 
             <button
               onClick={handleAddSchedule}
               disabled={!scheduleTime}
-              className="w-full rounded-full py-2.5 text-xs font-bold flex items-center justify-center gap-1.5 disabled:opacity-50 bg-[var(--color-primary)] text-white shadow-sm"
+              className="w-full rounded-full py-3 text-xs font-bold flex items-center justify-center gap-2 disabled:opacity-50 bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg"
             >
-              <Calendar size={15} /> 예약 대기열 추가
+              <Calendar size={15} /> 예약 등록하기
             </button>
           </div>
         </div>
@@ -1113,71 +1100,69 @@ export default function Home() {
       {/* RSS Add Modal */}
       {showAddFeed && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-5 bg-[rgba(28,23,48,0.45)] backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-5 bg-slate-950/80 backdrop-blur-md"
           onClick={() => setShowAddFeed(false)}
         >
-          <div className="fg-pop w-full max-w-sm rounded-3xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-display text-lg text-[var(--color-ink)]">RSS 피드 추가</h2>
-              <button onClick={() => setShowAddFeed(false)} aria-label="닫기">
-                <X size={18} color="#8A80B0" />
+          <div className="fg-pop w-full max-w-sm rounded-3xl glass-panel-glow p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
+              <h2 className="font-display text-lg font-bold text-white flex items-center gap-2">
+                <Rss size={18} className="text-purple-400" /> RSS 피드 구독 추가
+              </h2>
+              <button onClick={() => setShowAddFeed(false)} className="text-slate-400 hover:text-white">
+                <X size={18} />
               </button>
             </div>
-            <label className="text-xs font-bold text-[var(--color-ink)]">피드 URL 주소</label>
+            <label className="text-xs font-bold text-slate-300 block mb-1">피드 URL 주소</label>
             <input
               value={feedInput}
               onChange={(e) => setFeedInput(e.target.value)}
               placeholder="https://example.com/rss.xml"
-              className="w-full mt-1.5 mb-3 rounded-xl px-3.5 py-2.5 text-xs font-mono-ui bg-[var(--color-bg)] border border-[var(--color-border)] text-[var(--color-ink)]"
+              className="w-full mt-1 mb-3.5 rounded-xl px-3.5 py-2.5 text-xs font-mono-ui bg-slate-900 border border-white/10 text-white focus:outline-none focus:border-purple-500"
             />
-            <label className="text-xs font-bold text-[var(--color-ink)]">표시 이름 (선택)</label>
+            <label className="text-xs font-bold text-slate-300 block mb-1">커스텀 이름 (선택)</label>
             <input
               value={feedNameInput}
               onChange={(e) => setFeedNameInput(e.target.value)}
-              placeholder="예: IT 테크 블로그"
-              className="w-full mt-1.5 mb-1.5 rounded-xl px-3.5 py-2.5 text-xs bg-[var(--color-bg)] border border-[var(--color-border)] text-[var(--color-ink)]"
+              placeholder="예: IT 테크 매거진"
+              className="w-full mt-1 mb-2 rounded-xl px-3.5 py-2.5 text-xs bg-slate-900 border border-white/10 text-white focus:outline-none focus:border-purple-500"
               onKeyDown={(e) => e.key === "Enter" && handleAddFeed()}
             />
-            {addError && <p className="text-xs mt-1 mb-1 text-[var(--color-coral)]">{addError}</p>}
+            {addError && <p className="text-xs mt-1 mb-2 text-red-400 font-medium">{addError}</p>}
             <button
               onClick={handleAddFeed}
-              className="w-full mt-3 rounded-full py-2.5 text-xs font-bold flex items-center justify-center gap-1.5 bg-[var(--color-primary)] text-white shadow-sm"
+              className="w-full mt-4 rounded-full py-3 text-xs font-bold flex items-center justify-center gap-2 bg-gradient-to-r from-violet-600 to-purple-600 text-white shadow-lg"
             >
-              <Plus size={15} /> 피드 구독 추가
+              <Plus size={15} /> 구독 등록
             </button>
           </div>
         </div>
       )}
 
-      {/* API Key Guide Modal */}
+      {/* Info Modal */}
       {showInfo && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-5 bg-[rgba(28,23,48,0.45)] backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-5 bg-slate-950/80 backdrop-blur-md"
           onClick={() => setShowInfo(false)}
         >
-          <div className="fg-pop w-full max-w-md rounded-3xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="font-display text-lg text-[var(--color-ink)]">인스타그램 연동 & 설정 안내</h2>
-              <button onClick={() => setShowInfo(false)} aria-label="닫기">
-                <X size={18} color="#8A80B0" />
+          <div className="fg-pop w-full max-w-md rounded-3xl glass-panel-glow p-7 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4 border-b border-white/10 pb-3">
+              <h2 className="font-display text-lg font-bold text-white">인스타그램 연동 & 설정 안내</h2>
+              <button onClick={() => setShowInfo(false)} className="text-slate-400 hover:text-white">
+                <X size={18} />
               </button>
             </div>
-            <ol className="text-xs space-y-2.5 text-[var(--color-ink)] leading-relaxed font-medium">
+            <ol className="text-xs space-y-3 text-slate-300 leading-relaxed font-medium">
               <li className="flex gap-2">
-                <ChevronRight size={15} className="shrink-0 mt-0.5 text-[var(--color-primary)]" />
-                인스타그램 비즈니스/크리에이터 계정 전환 후 Facebook 페이지와 연동합니다.
+                <ChevronRight size={15} className="shrink-0 mt-0.5 text-purple-400" />
+                인스타그램 계정을 비즈니스 계정으로 전환 후 Facebook 페이지와 연동합니다.
               </li>
               <li className="flex gap-2">
-                <ChevronRight size={15} className="shrink-0 mt-0.5 text-[var(--color-primary)]" />
-                Meta Developers에서 Instagram Graph API access_token 과 business_id를 발급받습니다.
+                <ChevronRight size={15} className="shrink-0 mt-0.5 text-purple-400" />
+                Meta for Developers에서 Instagram Graph API 권한 토큰을 발급받습니다.
               </li>
               <li className="flex gap-2">
-                <ChevronRight size={15} className="shrink-0 mt-0.5 text-[var(--color-primary)]" />
-                발급받은 키를 `.env.local`의 INSTAGRAM_ACCESS_TOKEN, INSTAGRAM_BUSINESS_ID로 설정합니다.
-              </li>
-              <li className="flex gap-2">
-                <ChevronRight size={15} className="shrink-0 mt-0.5 text-[var(--color-primary)]" />
-                Anthropic API 키(ANTHROPIC_API_KEY) 설정 시 AI multi-tone 캡션 생성이 자동 동작합니다.
+                <ChevronRight size={15} className="shrink-0 mt-0.5 text-purple-400" />
+                `.env.local` 파일에 INSTAGRAM_ACCESS_TOKEN 및 INSTAGRAM_BUSINESS_ID를 지정합니다.
               </li>
             </ol>
           </div>
@@ -1186,8 +1171,8 @@ export default function Home() {
 
       {/* Toast Notification */}
       {toast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 rounded-full px-5 py-3 text-xs font-bold fg-pop flex items-center gap-2 bg-[var(--color-ink)] text-white shadow-xl">
-          <Check size={16} color="#C6F135" /> {toast}
+        <div className="fixed bottom-7 left-1/2 -translate-x-1/2 z-50 rounded-full px-6 py-3 text-xs font-bold fg-pop flex items-center gap-2.5 bg-gradient-to-r from-violet-600 via-purple-600 to-pink-500 text-white shadow-2xl shadow-purple-500/40 border border-white/20">
+          <Check size={16} /> {toast}
         </div>
       )}
     </div>
