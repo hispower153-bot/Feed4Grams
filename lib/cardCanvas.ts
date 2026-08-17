@@ -165,21 +165,21 @@ export function drawCardToCanvas(canvas: HTMLCanvasElement, options: CardCanvasO
         const descLines: string[] = [];
 
         for (const paragraph of rawParagraphs) {
-          const words = paragraph.split(" ");
-          let descLine = "";
-
-          for (let n = 0; n < words.length; n++) {
-            const testLine = descLine + words[n] + " ";
+          let currentLine = "";
+          // Iterate character by character or word by word to support Korean text without spaces
+          const chars = Array.from(paragraph);
+          for (let i = 0; i < chars.length; i++) {
+            const testLine = currentLine + chars[i];
             const metrics = ctx.measureText(testLine);
-            if (metrics.width > maxTitleWidth && n > 0) {
-              descLines.push(descLine.trim());
-              descLine = words[n] + " ";
+            if (metrics.width > maxTitleWidth && i > 0) {
+              descLines.push(currentLine.trim());
+              currentLine = chars[i];
             } else {
-              descLine = testLine;
+              currentLine = testLine;
             }
           }
-          if (descLine.trim()) {
-            descLines.push(descLine.trim());
+          if (currentLine.trim()) {
+            descLines.push(currentLine.trim());
           }
         }
 

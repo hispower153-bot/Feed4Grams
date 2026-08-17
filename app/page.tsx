@@ -332,9 +332,9 @@ export default function Home() {
 
   useEffect(() => {
     if (showCardCanvasModal) {
-      setTimeout(() => handleRenderCanvas(), 50);
+      handleRenderCanvas();
     }
-  }, [showCardCanvasModal, handleRenderCanvas]);
+  }, [showCardCanvasModal, caption, cardTheme, cardAspectRatio, handleRenderCanvas]);
 
   const downloadCanvasImage = () => {
     if (!canvasRef.current || !selected) return;
