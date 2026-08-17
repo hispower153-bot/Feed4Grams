@@ -322,7 +322,8 @@ export default function Home() {
     const f = feedById(selected.feedId);
     drawCardToCanvas(canvasRef.current, {
       title: selected.title,
-      description: caption || selected.description,
+      description: selected.description,
+      caption: caption,
       sourceName: f?.name || "Feed4Grams",
       imageUrl: selected.image,
       theme: cardTheme,

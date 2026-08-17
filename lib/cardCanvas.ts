@@ -3,6 +3,7 @@ import { CardTemplateTheme, CardAspectRatio } from "./types";
 export interface CardCanvasOptions {
   title: string;
   description?: string;
+  caption?: string;
   sourceName?: string;
   imageUrl?: string | null;
   theme: CardTemplateTheme;
@@ -11,7 +12,7 @@ export interface CardCanvasOptions {
 
 export function drawCardToCanvas(canvas: HTMLCanvasElement, options: CardCanvasOptions): Promise<void> {
   return new Promise((resolve) => {
-    const { title, description = "", sourceName = "NEWS", imageUrl, theme, aspectRatio } = options;
+    const { title, description = "", caption = "", sourceName = "NEWS", imageUrl, theme, aspectRatio } = options;
     const ctx = canvas.getContext("2d");
     if (!ctx) return resolve();
 
@@ -154,19 +155,19 @@ export function drawCardToCanvas(canvas: HTMLCanvasElement, options: CardCanvasO
       currentY += 12;
 
       // Description / Caption Drawing (Multi-line with line break support)
-      if (description) {
+      const bodyText = caption || description;
+      if (bodyText) {
         ctx.fillStyle = subTextColor;
         ctx.font = "normal 28px sans-serif";
         const descLineHeight = 40;
-        const maxDescLines = aspectRatio === "4:5" ? 6 : 3;
+        const maxDescLines = aspectRatio === "4:5" ? 8 : 4;
 
         // Split text by newlines first
-        const rawParagraphs = description.split("\n").filter((p) => p.trim().length > 0);
+        const rawParagraphs = bodyText.split("\n").filter((p) => p.trim().length > 0);
         const descLines: string[] = [];
 
         for (const paragraph of rawParagraphs) {
           let currentLine = "";
-          // Iterate character by character or word by word to support Korean text without spaces
           const chars = Array.from(paragraph);
           for (let i = 0; i < chars.length; i++) {
             const testLine = currentLine + chars[i];
