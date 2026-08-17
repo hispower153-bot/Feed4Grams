@@ -322,13 +322,13 @@ export default function Home() {
     const f = feedById(selected.feedId);
     drawCardToCanvas(canvasRef.current, {
       title: selected.title,
-      description: selected.description,
+      description: caption || selected.description,
       sourceName: f?.name || "Feed4Grams",
       imageUrl: selected.image,
       theme: cardTheme,
       aspectRatio: cardAspectRatio,
     });
-  }, [selected, cardTheme, cardAspectRatio, feeds]);
+  }, [selected, caption, cardTheme, cardAspectRatio, feeds]);
 
   useEffect(() => {
     if (showCardCanvasModal) {

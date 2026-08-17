@@ -153,28 +153,36 @@ export function drawCardToCanvas(canvas: HTMLCanvasElement, options: CardCanvasO
 
       currentY += 12;
 
-      // Description Drawing (Multi-line)
+      // Description / Caption Drawing (Multi-line with line break support)
       if (description) {
         ctx.fillStyle = subTextColor;
         ctx.font = "normal 28px sans-serif";
-        const descWords = description.split(" ");
-        let descLine = "";
-        const descLines: string[] = [];
         const descLineHeight = 40;
+        const maxDescLines = aspectRatio === "4:5" ? 6 : 3;
 
-        for (let n = 0; n < descWords.length; n++) {
-          const testLine = descLine + descWords[n] + " ";
-          const metrics = ctx.measureText(testLine);
-          if (metrics.width > maxTitleWidth && n > 0) {
+        // Split text by newlines first
+        const rawParagraphs = description.split("\n").filter((p) => p.trim().length > 0);
+        const descLines: string[] = [];
+
+        for (const paragraph of rawParagraphs) {
+          const words = paragraph.split(" ");
+          let descLine = "";
+
+          for (let n = 0; n < words.length; n++) {
+            const testLine = descLine + words[n] + " ";
+            const metrics = ctx.measureText(testLine);
+            if (metrics.width > maxTitleWidth && n > 0) {
+              descLines.push(descLine.trim());
+              descLine = words[n] + " ";
+            } else {
+              descLine = testLine;
+            }
+          }
+          if (descLine.trim()) {
             descLines.push(descLine.trim());
-            descLine = descWords[n] + " ";
-          } else {
-            descLine = testLine;
           }
         }
-        descLines.push(descLine.trim());
 
-        const maxDescLines = aspectRatio === "4:5" ? 4 : 2;
         descLines.slice(0, maxDescLines).forEach((l, idx) => {
           if (idx === maxDescLines - 1 && descLines.length > maxDescLines) {
             ctx.fillText(l + "...", margin, currentY);
