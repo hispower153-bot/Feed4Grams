@@ -10,7 +10,7 @@ type CustomItem = {
 const parser: Parser<Record<string, unknown>, CustomItem> = new Parser({
   timeout: 10000,
   headers: {
-    "User-Agent": "Mozilla/5.0 (compatible; FeedGramBot/1.0; +https://vercel.com)",
+    "User-Agent": "Mozilla/5.0 (compatible; Feed4GramsBot/1.0; +https://vercel.com)",
     Accept: "application/rss+xml, application/atom+xml, application/xml, text/xml, */*",
   },
   customFields: {
